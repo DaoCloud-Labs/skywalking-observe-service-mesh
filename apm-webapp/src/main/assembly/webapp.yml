@@ -20,9 +20,15 @@ server:
 collector:
   path: /graphql
   ribbon:
-    ReadTimeout: 10000
+    ReadTimeout: 20000
     # Point to all backend's restHost:restPort, split by ,
-    listOfServers: 127.0.0.1:12800
+    listOfServers: oap:12800
+zuul:
+  ignoredServices: '*'
+  routes:
+    api:
+      path: /graphql
+      serviceId: collector 
 
 security:
   user:
