@@ -18,18 +18,18 @@
 
 package org.apache.skywalking.apm.webapp.proxy;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ResourceUtils;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * NotFoundHandler handles the single page application url routing.
@@ -41,11 +41,10 @@ public class NotFoundHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<String> renderDefaultPage() {
         try {
-            File indexFile = ResourceUtils.getFile("classpath:public/index.html");
-            FileInputStream inputStream = new FileInputStream(indexFile);
-            String body = StreamUtils.copyToString(inputStream, Charset.defaultCharset());
+            String body = StreamUtils.copyToString(new ClassPathResource("/public/index.html").getInputStream(), Charset.defaultCharset());
             return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(body);
         } catch (final IOException e) {
+            LoggerFactory.getLogger(NotFoundHandler.class).error("err", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("There was an error completing the action.");
         }
     }
